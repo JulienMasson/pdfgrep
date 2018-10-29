@@ -40,34 +40,14 @@
   "Pdfgrep search buffer."
   :type '(string))
 
-(defcustom pdfgrep-context-length 100
-  "PDFGrep default context length, option `-C'."
-  :type '(integer))
-
-(defcustom pdfgrep-ignore-case t
-  "PDFGrep ignore case option."
-  :type '(boolean))
-
-(defcustom pdfgrep-ignore-errors nil
-  "Redirect pdfgrep command errors to /dev/null."
-  :type '(boolean))
-
 (defvar pdfgrep-history '()
   "Command History list for PDFGrep.")
 
 (defvar pdfgrep-program "pdfgrep"
   "The default pdfgrep program.")
 
-(defun pdfgrep-default-command ()
-  "Compute the default pdfgrep command for `pdfgrep'."
-  (let ((cmd (concat pdfgrep-program " -H -n "
-		     (when pdfgrep-ignore-case
-		       "-i ")
-		     (when pdfgrep-context-length
-		       (format "-C %d " pdfgrep-context-length)))))
-    (if pdfgrep-ignore-errors
-	(cons (concat cmd " 2>/dev/null") (1+ (length cmd)))
-      cmd)))
+(defvar pdfgrep-default-command (concat pdfgrep-program " --color=always -nrH ")
+  "default pdfgrep command for `pdfgrep'.")
 
 (defun pdfgrep (command-args)
   "Run pdfgrep with user-specified COMMAND-ARGS, collect output in a buffer.
@@ -75,7 +55,7 @@ You can use \\[next-error], or RET in the `pdfgrep-buffer-name'
 buffer, to go to the lines where PDFGrep found matches.  To kill
 the PDFGrep job before it finishes, type \\[kill-compilation]."
   (interactive (list (read-shell-command "Run pdfgrep (like this): "
-					 (pdfgrep-default-command)
+					 pdfgrep-default-command
 					 'pdfgrep-history)))
   (unless pdfgrep-mode
     (error "PDFGrep is not enabled, run `pdfgrep-mode' first."))
